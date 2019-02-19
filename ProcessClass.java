@@ -9,7 +9,9 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.Date;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 
 public class ProcessClass {
 	public HashMap<String,Item> itemlist = new HashMap<String,Item>();
@@ -67,27 +69,45 @@ public class ProcessClass {
 			scan = new Scanner(file);
 			while(scan.hasNextLine()) {
 				text=scan.nextLine();
+				try {
 					String[] parts = text.split(",");
 					String time = parts[0];
 					SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
 					Date date = format.parse(time);
 					Timestamp ts = new Timestamp(date.getTime());
 					String id = parts[1];
+					
+					//checking pattern of Customer Id
+					String pattern = "CUST\\d{3}";
+					Pattern pat = Pattern.compile(pattern);
+					Matcher m = pat.matcher(id);
+					if(!m.find()) {
+						throw new PatternException("The item Id should have the following pattern: CUST<a 3-digit number> eg.CUST123");
+					}
+					
 					String itemid = parts[2];
 					int quantity = Integer.parseInt(parts[3]);
 					double amount = Double.parseDouble(parts[4]);
 					Order order = new Order(ts,id,itemid,quantity,amount);
-					this.addOrder(order);
-				
-
+					orderlist.add(order);
+				}
+				catch(PatternException pe) {
+					JOptionPane.showMessageDialog(null, pe.getMessage());
+				}
+				catch(NumberFormatException e) {
+					e.printStackTrace();
+				}
+				catch(Exception ex) {
+					ex.printStackTrace();
+				}
+				finally {
+					continue;
+				}
 			}
 			scan.close();
 		}
 		catch(FileNotFoundException fnf) {
 			fnf.printStackTrace();
-		}
-		catch(NumberFormatException e) {
-			e.printStackTrace();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
