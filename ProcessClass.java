@@ -22,6 +22,10 @@ public class ProcessClass {
 		return orderlist;
 	}
 	
+	public HashMap<String,Report> getReportList(){
+		return reportlist;
+	}
+	
 	public HashMap<String,Item> getItemList(){
 		return itemlist;
 	}
