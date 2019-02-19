@@ -1,4 +1,4 @@
-
+//Class for items in the final report
 public class Report {
 
 	private String id;

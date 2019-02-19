@@ -21,7 +21,7 @@ public class ProcessClass {
 	public LinkedList<Order> getOrderList(){
 		return orderlist;
 	}
-	
+	 
 	public HashMap<String,Report> getReportList(){
 		return reportlist;
 	}
@@ -50,9 +50,13 @@ public class ProcessClass {
 				double price = Double.parseDouble(parts[2]);
 				String category = parts[3];
 				String id = parts[4];
+				
+				//Adding all menu items into itemList Hash Map
 				Item item = new Item(name,desc,price,category,id);
-				Report rpt = new Report(id,name,0,0.0);
 				itemlist.put(id, item);
+				
+				//Adding all menu items into reportList Hash Map with initial quantity and income as 0
+				Report rpt = new Report(id,name,0,0.0);
 				reportlist.put(id,rpt);
 			}
 			scan.close();
