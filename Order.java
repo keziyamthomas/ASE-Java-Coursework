@@ -5,6 +5,15 @@ public class Order {
 	private String custId;
 	private Item item;
 	private int quantity;
+	
+	public Order(Timestamp time, String custId, Item item, int quantity) {
+		
+		this.time = time;
+		this.custId = custId;
+		this.item = item;
+		this.quantity = quantity;
+		
+	}
 	public Timestamp getTime() {
 		return time;
 	}
