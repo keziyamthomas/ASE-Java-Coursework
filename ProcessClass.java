@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 
 public class ProcessClass {
 	public HashMap<String,Item> itemlist = new HashMap<String,Item>();
+	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
 	
 	public LinkedList<Order> getOrderList(){
@@ -46,7 +47,9 @@ public class ProcessClass {
 				String category = parts[3];
 				String id = parts[4];
 				Item item = new Item(name,desc,price,category,id);
+				Report rpt = new Report(id,name,0,0.0);
 				itemlist.put(id, item);
+				reportlist.put(id,rpt);
 			}
 			scan.close();
 		}
