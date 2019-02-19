@@ -6,6 +6,7 @@ public class Order {
 	private String custId;
 	private Item item;
 	private int quantity;
+	private double amount;
 	
 	public Order(Timestamp time, String custId, Item item, int quantity) {
 		
@@ -13,6 +14,16 @@ public class Order {
 		this.custId = custId;
 		this.item = item;
 		this.quantity = quantity;
+		
+	}
+	
+	public Order(Timestamp time, String custId, String item, int quantity, double amount) {
+		//Initialize ItemName and amount in addition to the rest of the variables 
+		this.time = time;
+		this.custId = custId;
+		this.item.setItemName(item);
+		this.quantity = quantity;
+        this.amount = amount;
 		
 	}
 	public Timestamp getTime() {
@@ -39,5 +50,8 @@ public class Order {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
+	public double getAmount(){
+        return amount;
+    }
 
 }
