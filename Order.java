@@ -1,3 +1,4 @@
+package coffeeshopapp;
 import java.sql.Timestamp;
 
 public class Order {

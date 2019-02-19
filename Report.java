@@ -1,3 +1,5 @@
+package coffeeshopapp;
+
 //Class for items in the final report
 public class Report {
 
