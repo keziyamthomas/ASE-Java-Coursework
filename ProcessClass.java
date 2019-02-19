@@ -27,6 +27,7 @@ public class ProcessClass {
 		orderlist.add(order);
 	}
 	
+	/* The readItems() method will read the items from Items.csv and add them to the hashmap ItemList */
 	public void readItems(){
 		Scanner scan;
 		String itemfile = "Items.csv";
