@@ -201,7 +201,7 @@ public class ProcessClass {
 		
 	}
 	
-	//This method populates the Report from the 
+	//This method populates the ReportList for generating final report 
 	public void populateReportList() {
 		for(Order o: orderlist) {
 			for(Map.Entry<String, Report> r: reportlist.entrySet()) {
@@ -214,6 +214,36 @@ public class ProcessClass {
 					r.setValue(new Report(id,name,quantity,total));
 				}
 			}
+		}
+		
+	}
+	//This method generates the final report
+	public String generateReport() {
+		String report="";
+		report += "Id         Item Name                    Quantity    Total\n";
+		for(Map.Entry<String, Report> r: reportlist.entrySet()) {
+			report += String.format("%-7s",r.getValue().getId());
+			report += String.format("%-20s",r.getValue().getItemName());
+			report += String.format("%-7s",r.getValue().getQuantity());
+			report += String.format("%-7s", r.getValue().getTotal());
+			report += "\n";
+		}
+		return report;
+	}
+	
+	//This method generates the report and writes them to a file
+	public void WriteToFile() {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter("Report.txt"));
+			String report = generateReport();
+			writer.write(report);
+			writer.close();
+		}
+		catch(FileNotFoundException fnf){
+			JOptionPane.showMessageDialog(null,"The file to write the report is not found");
+		}
+		catch(IOException io) {
+			io.printStackTrace();
 		}
 		
 	}
