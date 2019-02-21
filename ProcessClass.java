@@ -233,7 +233,10 @@ public class ProcessClass {
 			report += String.format("%-7s",r.getValue().getQuantity());
 			report += String.format("%-7s", r.getValue().getTotal());
 			report += "\r\n";
+			amount=amount+r.getVale().getTotal();
+			
 		}
+		report+="\t\t\t\tTotal: "+amount
 		return report;
 	}
 	
