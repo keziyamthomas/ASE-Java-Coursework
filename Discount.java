@@ -1,6 +1,6 @@
 package coffeeshopapp;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.Calendar;
 import java.util.LinkedList;
 
@@ -13,11 +13,12 @@ public class Discount {
 	//Method to calculate discount
 	public double calculateDiscount(double cost,LinkedList<Order> orderlist) {
 		//taking current day to decide on the type of discount
-		Date today = new Date(0);
+		Date today = new Date( );
 		Calendar c = Calendar.getInstance();
 		c.setTime(today);
+		System.out.println(today);
 		int day = c.get(Calendar.DAY_OF_WEEK);
-		if(day == 6 && day == 7 )
+		if(day == 6 || day == 7 )
 			discount = WeekendDiscount(orderlist);
 		else 
 			discount = WeekdayDiscount(cost);
