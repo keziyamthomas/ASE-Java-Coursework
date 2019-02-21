@@ -119,23 +119,17 @@ public class ProcessClass {
 					Timestamp ts = new Timestamp(date.getTime());
 					System.out.println("In PC" + ts.toString());
 					String id = parts[1];
-					
-					//checking pattern of Customer Id
-					String pattern = "CUST\\d{3}";
-					Pattern pat = Pattern.compile(pattern);
-					Matcher m = pat.matcher(id);
-					if(!m.find()) {
-						throw new PatternException("The item Id should have the following pattern: CUST<a 3-digit number> eg.CUST123");
-					}
-					
 					String itemid = parts[2];
 					int quantity = Integer.parseInt(parts[3]);
 					double amount = Double.parseDouble(parts[4]);
+					try {
+					
 					Order order = new Order(ts,id,itemid,quantity,amount);
 					orderlist.add(order);
-				}
-				catch(PatternException pe) {
-					JOptionPane.showMessageDialog(null, pe.getMessage());
+					}
+					catch(PatternException pe) {
+					   JOptionPane.showMessageDialog(null, pe.getMessage());
+					}
 				}
 				catch(NumberFormatException e) {
 					e.printStackTrace();
@@ -225,6 +219,7 @@ public class ProcessClass {
 	}
 	//This method generates the final report
 	public String generateReport() {
+		double amount;
 		String report="";
 		report += "Id     Item Name      Quantity    Total\r\n";
 		for(Map.Entry<String, Report> r: reportlist.entrySet()) {
@@ -236,7 +231,7 @@ public class ProcessClass {
 			amount=amount+r.getVale().getTotal();
 			
 		}
-		report+="\t\t\t\tTotal: "+amount
+		report+="\t\t\t\tTotal: "+amount;
 		return report;
 	}
 	
