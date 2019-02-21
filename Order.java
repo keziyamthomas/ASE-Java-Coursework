@@ -12,7 +12,7 @@ public class Order {
 		//Initialize ItemName and amount in addition to the rest of the variables 
 		this.time = time;
 		this.custId = custId;
-		this.item.setItemName(item);
+		this.itemId = item;
 		this.quantity = quantity;
         this.amount = amount;
 		
