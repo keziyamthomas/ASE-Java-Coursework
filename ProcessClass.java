@@ -179,5 +179,43 @@ public class ProcessClass {
 		}
 		return unitPrice;
 	}
+	
+	//This method generates the order Id based on the last Order in the list
+	public String generateOrderId() {
+		String orderId;
+		int n = Integer.parseInt(orderlist.getLast().getCustId().substring(4));
+		int newId = n + 1;
+		orderId = "CUST" + newId;
+		return orderId;
+	}
+	
+	//This method returns the Item Id from Item name
+	public String getItemIdByItemName(String name) {
+		String id=null;
+		for(Map.Entry<String, Item> entry: itemlist.entrySet()){
+			if(name.equals(entry.getValue().getItemName())) {
+				id = entry.getValue().getId();
+			}
+		}
+		return id;
+		
+	}
+	
+	//This method populates the Report from the 
+	public void populateReportList() {
+		for(Order o: orderlist) {
+			for(Map.Entry<String, Report> r: reportlist.entrySet()) {
+				if(o.getItemId().equals(r.getKey())) {
+					String id = r.getValue().getId();
+					String name = r.getValue().getItemName();
+					int quantity = r.getValue().getQuantity()+o.getQuantity();
+					//double uprice = getUnitPriceByItemName(r.getValue().getItemName());
+					double total = r.getValue().getTotal() + o.getAmount();
+					r.setValue(new Report(id,name,quantity,total));
+				}
+			}
+		}
+		
+	}
 
 }
