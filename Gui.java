@@ -1,5 +1,12 @@
 package coffeeshopapp;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
@@ -13,14 +20,20 @@ public class Gui extends javax.swing.JFrame {
      * Creates new form NewJFrame
      */
     DefaultTableModel model;
+    HashMap<String, Item> hash;
+    LinkedList<Order> orderList;
     ProcessClass processClass ;
     public Gui() {
         initComponents();
         model = (DefaultTableModel)orderTable.getModel();
         processClass = new ProcessClass();
+        //Load the Menu
         processClass.readItems();
-        processClass.readOrder();
+        hash = processClass.getItemList();
         
+        //Load the unprocessed 
+        processClass.readOrder();		
+        orderList = new LinkedList<Order>();
     }
 
     /**
@@ -56,8 +69,16 @@ public class Gui extends javax.swing.JFrame {
         totalBtn = new javax.swing.JButton();
         totalLabel = new javax.swing.JLabel();
         warningLabel = new javax.swing.JLabel();
+        discountLabel = new javax.swing.JLabel();
+        discountAmtLabel = new javax.swing.JLabel();
+
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Sitka Banner", 3, 24)); // NOI18N
         jLabel1.setText("Cafe Coffee Beans");
@@ -263,6 +284,7 @@ public class Gui extends javax.swing.JFrame {
         jScrollPane1.setViewportView(orderTable);
         orderTable.getAccessibleContext().setAccessibleName("orderTable");
 
+        
         totalBtn.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         totalBtn.setText("Total");
         totalBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -272,6 +294,7 @@ public class Gui extends javax.swing.JFrame {
         });
 
         totalLabel.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        warningLabel.setForeground(new java.awt.Color(255, 0, 153));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -299,7 +322,7 @@ public class Gui extends javax.swing.JFrame {
                     .addComponent(totalLabel))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
+        discountLabel.setText("Discount");
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -321,6 +344,12 @@ public class Gui extends javax.swing.JFrame {
                 .addGap(50, 50, 50)
                 .addComponent(warningLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 660, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(discountLabel)
+                    .addGap(62, 62, 62)
+                    .addComponent(discountAmtLabel)
+                    .addGap(142, 142, 142))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -335,7 +364,11 @@ public class Gui extends javax.swing.JFrame {
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(warningLabel)
-                .addGap(0, 40, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(discountLabel)
+                    .addComponent(discountAmtLabel))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -347,12 +380,31 @@ public class Gui extends javax.swing.JFrame {
         
     }                                         
 
-    private void addBtn1ActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        model.insertRow(model.getRowCount(),new Object[]{model.getRowCount()+1,"Coffee","2",quantityTextbox.getText()});
+    private void addBtn1ActionPerformed(java.awt.event.ActionEvent evt) { 
+    	int x = Integer.parseInt((String) quantityTextbox.getText());
+    	if(x < 10 ) {
+            model.insertRow(model.getRowCount(),new Object[]{model.getRowCount()+1,
+            		itemsCombo.getSelectedItem(),
+            		unitPriceLabel.getText(),
+            		quantityTextbox.getText()});
+       	}
+    	else {
+    		warningLabel.setText("Quantity should be less than 10!!!");
+    		quantityTextbox.setText(null);
+    	}
     }                                       
 
     private void editBtnActionPerformed(java.awt.event.ActionEvent evt) {                                        
-        model.setValueAt(quantityTextbox.getText(), orderTable.getSelectedRow(),3);
+        
+        int x = Integer.parseInt((String) quantityTextbox.getText());
+    	if(x < 10 ) {
+    		model.setValueAt(quantityTextbox.getText(), orderTable.getSelectedRow(),3);
+       	}
+    	else {
+    		warningLabel.setText("Quantity should be less than 10!!!");
+    		quantityTextbox.setText(null);
+    	}
+
     }                                       
 
     private void orderTableMouseClicked(java.awt.event.MouseEvent evt) {                                        
@@ -363,27 +415,43 @@ public class Gui extends javax.swing.JFrame {
 
     private void totalBtnActionPerformed(java.awt.event.ActionEvent evt) {  
         /**
-        * Display the total amount
+        * Display the total amount 
         */
-        int total = 0, quantity = 0, unitPrice = 0;
-        
+        int total = 0, quantity = 0 ;
+        double unitPrice = 0;
+        Discount discount = new Discount();
+                
         for (int i = 0; i < orderTable.getRowCount(); i++){
             quantity = Integer.parseInt((String) orderTable.getValueAt(i, 3));
-            unitPrice = Integer.parseInt((String) orderTable.getValueAt(i, 2));
+            unitPrice = Double.parseDouble((String) orderTable.getValueAt(i, 2));
             total += quantity * unitPrice;
         }
-        totalLabel.setText(Integer.toString(total));
         
+        double discountAmt = discount.calculateDiscount((double)total,orderList);
+        totalLabel.setText(Double.toString((double)total - discountAmt));
+        discountAmtLabel.setText(Double.toString(discountAmt));
+        
+        
+        System.out.println(Double.toString((double)total - discountAmt) + "In GUI 1");
+        System.out.println(Double.toString(discountAmt) + "In GUI 2");
     }                                        
 
     private void hotBeverageBtnActionPerformed(java.awt.event.ActionEvent evt) {                                               
-        //Search in hashmap for hotBeverageitems
-        //Add the item names in combo box
-        itemsCombo.setModel(new DefaultComboBoxModel(processClass.getItemsByCategory("HotBeverage").toArray()));
+    	List<String> list = processClass.getItemByCategory("HotBeverage");
+    	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
+    	for(String str: list) {
+    		df.addElement(str);
+    	}
+    	itemsCombo.setModel(df);
+    	unitPriceLabel.setText(Double.toString(processClass.getUnitPriceByItemName(itemsCombo.getSelectedItem().toString())));
+    	
     }                                              
 
-    private void itemsComboActionPerformed(java.awt.event.ActionEvent evt) {                                           
-        // Search for unitprice value of the selected item and populate it in unitprice label
+    private void itemsComboActionPerformed(java.awt.event.ActionEvent evt) {                              
+    	Double var = (processClass.getUnitPriceByItemName(itemsCombo.getSelectedItem().toString()));
+    	String s = Double.toString(var);
+    	unitPriceLabel.setText(s);
+    	quantityTextbox.setText("1");
     }                                          
 
     private void newOrderBtnActionPerformed(java.awt.event.ActionEvent evt) {                                            
@@ -393,24 +461,103 @@ public class Gui extends javax.swing.JFrame {
     }                                           
 
     private void shakesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                          
-        itemsCombo.setModel(new DefaultComboBoxModel(processClass.getItemsByCategory("Shake").toArray()));
-        
+    	List<String> list = processClass.getItemByCategory("Shake");
+    	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
+    	for(String str: list) {
+    		df.addElement(str);
+    	}
+    	itemsCombo.setModel(df);
+    	unitPriceLabel.setText(Double.toString(processClass.getUnitPriceByItemName(itemsCombo.getSelectedItem().toString())));
         
     }                                         
 
     private void coldBeveragesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-        itemsCombo.setModel(new DefaultComboBoxModel(processClass.getItemsByCategory("Cold Beverage").toArray()));
+    	List<String> list = processClass.getItemByCategory("ColdBeverage");
+    	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
+    	for(String str: list) {
+    		df.addElement(str);
+    	}
+    	itemsCombo.setModel(df);
+    	unitPriceLabel.setText(Double.toString(processClass.getUnitPriceByItemName(itemsCombo.getSelectedItem().toString())));
+  
     }                                                
 
     private void quickBitesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        itemsCombo.setModel(new DefaultComboBoxModel(processClass.getItemsByCategory("Quick bites").toArray()));
-    }                                             
-
+        List<String> list = processClass.getItemByCategory("Quick bites");
+    	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
+    	for(String str: list) {
+    		df.addElement(str);
+      	}
+    	itemsCombo.setModel(df);
+    	unitPriceLabel.setText(Double.toString(processClass.getUnitPriceByItemName(itemsCombo.getSelectedItem().toString())));
+    }   
     
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {                                   
+        // Generate Report
+    }   
+    
+    public void saveOrderToList(Timestamp time, String custId, String item, int quantity, double amount)
+    {
+    	/* save the order to the linked list of current orderList */
+    	Order order = new Order(time,custId,item,quantity,amount);
+        orderList.add(order);
+    }
+    
+    public LinkedList<Order> getCurrentOrderList()
+    {
+        // Iterate through the table and add return the full order as list
+    	for (int row=0; row < orderTable.getRowCount(); row++) {
+    		Timestamp time = new Timestamp(System.currentTimeMillis());
+    		String custId = processClass.getItemIdByItemName(orderTable.getValueAt(row, 1).toString());
+    		String item = orderTable.getValueAt(row, 1).toString();
+    		int quantity = (Integer)orderTable.getValueAt(row, 3);
+    		int amount = (Integer)orderTable.getValueAt(row, 2) * (Integer)orderTable.getValueAt(row, 3); //unitPrice * quantity
+    		saveOrderToList(time,custId,item,quantity,amount);
+    	}
+    	return orderList;
+    		   
+    }
+
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Gui.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new Gui().setVisible(true);
+               
+            }
+           
+        });
+    }
     // Variables declaration - do not modify                     
     private javax.swing.JButton addBtn1;
     private javax.swing.JButton coldBeveragesBtn;
     private javax.swing.JButton deleteBtn;
+    private javax.swing.JLabel discountAmtLabel;
+    private javax.swing.JLabel discountLabel;
     private javax.swing.JButton editBtn;
     private javax.swing.JButton hotBeverageBtn;
     private javax.swing.JComboBox<String> itemsCombo;
