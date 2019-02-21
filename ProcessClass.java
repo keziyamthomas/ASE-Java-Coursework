@@ -15,25 +15,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
+
 public class ProcessClass {
 	public HashMap<String,Item> itemlist = new HashMap<String,Item>();
 	public HashMap<String,Report> reportlist = new HashMap<String,Report>();
 	public LinkedList<Order> orderlist = new LinkedList<Order>();
 	
+	//This method will return the LinkedList of Orders
 	public LinkedList<Order> getOrderList(){
 		return orderlist;
 	}
 	 
+	//This method will return HashMap of Report
 	public HashMap<String,Report> getReportList(){
 		return reportlist;
 	}
 	
+	//This method will return HashMap of Items
 	public HashMap<String,Item> getItemList(){
 		return itemlist;
-	}
-	
-	public void addOrder(Order order) {
-		orderlist.add(order);
 	}
 	
 	/* The readItems() method will read the items from Items.csv and add them to the hashmap ItemList */
@@ -47,6 +47,7 @@ public class ProcessClass {
 			while(scan.hasNextLine()) {
 				text = scan.nextLine();
 				try {
+					//splitting each line using , as delimiter
 					String[] parts = text.split(",");
 					String name = parts[0];
 					String desc = parts[1];
@@ -69,6 +70,7 @@ public class ProcessClass {
 					catch(PatternException pe) {
 						JOptionPane.showMessageDialog(null, pe.getMessage());
 					}
+					//catches exception in parsing string to integers
 					catch(NumberFormatException e) {
 						e.printStackTrace();
 					}
@@ -91,6 +93,9 @@ public class ProcessClass {
 			ex.printStackTrace();
 		}
 	}
+	
+	//Method to read items from Order.csv and insert them to LinkedList
+	
 	public void readOrder(){
 		Scanner scan;
 		String orderfile = "Order.csv";
@@ -101,6 +106,7 @@ public class ProcessClass {
 			while(scan.hasNextLine()) {
 				text=scan.nextLine();
 				try {
+					//splitting each line of the file to store in different variables
 					String[] parts = text.split(",");
 					String time = parts[0];
 					SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
@@ -144,7 +150,15 @@ public class ProcessClass {
 			ex.printStackTrace();
 		}
 	}
-	http://resources.mpi-inf.mpg.de/d5/teaching/ss05/is05/javadoc/java/util/HashMap.Entry.html
+	
+	//This method appends new orders with existing orders
+	public void addOrder(LinkedList<Order> list) {
+		orderlist.addAll(list);
+	}
+	
+	
+	//Reference-http://resources.mpi-inf.mpg.de/d5/teaching/ss05/is05/javadoc/java/util/HashMap.Entry.html
+	// Get the list of items in a particular Category
 	public List<String> getItemsByCategory(String category) {
 		List<String> items = new ArrayList<String>();
 		for(Map.Entry<String, Item> entry: itemlist.entrySet()) {
@@ -155,6 +169,7 @@ public class ProcessClass {
 		return items;
 	}
 	
+	//Get the unit price of an item based on the name
 	public double getUnitPriceByItemName(String itemName) {
 		double unitPrice=0.0;
 		for(Map.Entry<String, Item> entry: itemlist.entrySet()){
