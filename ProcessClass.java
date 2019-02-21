@@ -46,21 +46,39 @@ public class ProcessClass {
 			scan = new Scanner(file);
 			while(scan.hasNextLine()) {
 				text = scan.nextLine();
-				String[] parts = text.split(",");
-				String name = parts[0];
-				String desc = parts[1];
-				double price = Double.parseDouble(parts[2]);
-				String category = parts[3];
-				String id = parts[4];
-				
-				//Adding all menu items into itemList Hash Map
-				Item item = new Item(name,desc,price,category,id);
-				itemlist.put(id, item);
-				
-				//Adding all menu items into reportList Hash Map with initial quantity and income as 0
-				Report rpt = new Report(id,name,0,0.0);
-				reportlist.put(id,rpt);
-			}
+				try {
+					String[] parts = text.split(",");
+					String name = parts[0];
+					String desc = parts[1];
+					double price = Double.parseDouble(parts[2]);
+					String category = parts[3];
+					String id = parts[4];
+					
+					String pattern = "BIT|HOT|SHK|CCD\\d{3}";
+					Pattern pat = Pattern.compile(pattern);
+					Matcher m = pat.matcher(id);
+					if(!m.find()){
+						throw new PatternException("Incorrect Id: " + id +" in Items.csv. The item Id should have the following pattern:<BIT/HOT/SHK/CCD><3-digit number> eg:BIT123, HOT123, SHK123, CCD123");
+					}
+					Item item = new Item(name,desc,price,category,id);
+					itemlist.put(id, item);
+					
+					Report rpt = new Report(id,name,0,0.0);
+					reportlist.put(id,rpt);
+					}
+					catch(PatternException pe) {
+						JOptionPane.showMessageDialog(null, pe.getMessage());
+					}
+					catch(NumberFormatException e) {
+						e.printStackTrace();
+					}
+					catch(Exception ex) {
+						ex.printStackTrace();
+					}
+					finally {
+						continue;
+					}
+				}
 			scan.close();
 		}
 		catch(FileNotFoundException fnf) {
@@ -126,15 +144,25 @@ public class ProcessClass {
 			ex.printStackTrace();
 		}
 	}
-	
+	http://resources.mpi-inf.mpg.de/d5/teaching/ss05/is05/javadoc/java/util/HashMap.Entry.html
 	public List<String> getItemsByCategory(String category) {
 		List<String> items = new ArrayList<String>();
 		for(Map.Entry<String, Item> entry: itemlist.entrySet()) {
-			if(category.equals(entry.getValue().getItemName())) {
+			if(category.equals(entry.getValue().getCategory())) {
 				items.add(entry.getValue().getItemName());
 			}
 		}
 		return items;
+	}
+	
+	public double getUnitPriceByItemName(String itemName) {
+		double unitPrice=0.0;
+		for(Map.Entry<String, Item> entry: itemlist.entrySet()){
+			if(itemName.equals(entry.getValue().getItemName())) {
+				unitPrice = entry.getValue().getPrice();
+			}
+		}
+		return unitPrice;
 	}
 
 }
