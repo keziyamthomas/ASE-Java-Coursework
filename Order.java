@@ -4,18 +4,9 @@ import java.sql.Timestamp;
 public class Order {
 	private Timestamp time;
 	private String custId;
-	private Item item;
+	private String itemId;
 	private int quantity;
 	private double amount;
-	
-	public Order(Timestamp time, String custId, Item item, int quantity) {
-		
-		this.time = time;
-		this.custId = custId;
-		this.item = item;
-		this.quantity = quantity;
-		
-	}
 	
 	public Order(Timestamp time, String custId, String item, int quantity, double amount) {
 		//Initialize ItemName and amount in addition to the rest of the variables 
@@ -38,11 +29,11 @@ public class Order {
 	public void setCustId(String custId) {
 		this.custId = custId;
 	}
-	public Item getItem() {
-		return item;
+	public String getItemId() {
+		return itemId;
 	}
-	public void setItem(Item item) {
-		this.item = item;
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
 	}
 	public int getQuantity() {
 		return quantity;

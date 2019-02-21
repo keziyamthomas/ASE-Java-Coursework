@@ -35,10 +35,10 @@ public class Report {
 		this.quantity = quantity;
 	}
 	public double getTotal() {
-		return income;
+		return total;
 	}
 	public void setTotal(double income) {
-		this.income = income;
+		this.total = income;
 	}
 	
 }
