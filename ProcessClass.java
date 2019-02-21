@@ -1,7 +1,10 @@
 package coffeeshopapp;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -98,7 +101,7 @@ public class ProcessClass {
 	
 	public void readOrder(){
 		Scanner scan;
-		String orderfile = "Order.csv";
+		String orderfile = "Orders.csv";
 		File file =new File(orderfile);
 		String text;
 		try {
@@ -110,8 +113,11 @@ public class ProcessClass {
 					String[] parts = text.split(",");
 					String time = parts[0];
 					SimpleDateFormat format = new SimpleDateFormat("dd/MM/YYYY hh:mm");
+					System.out.println("In PC" + time.toString());
 					Date date = format.parse(time);
+					System.out.println("In PC" + date.toString());
 					Timestamp ts = new Timestamp(date.getTime());
+					System.out.println("In PC" + ts.toString());
 					String id = parts[1];
 					
 					//checking pattern of Customer Id
@@ -220,13 +226,13 @@ public class ProcessClass {
 	//This method generates the final report
 	public String generateReport() {
 		String report="";
-		report += "Id         Item Name                    Quantity    Total\n";
+		report += "Id     Item Name      Quantity    Total\r\n";
 		for(Map.Entry<String, Report> r: reportlist.entrySet()) {
 			report += String.format("%-7s",r.getValue().getId());
 			report += String.format("%-20s",r.getValue().getItemName());
 			report += String.format("%-7s",r.getValue().getQuantity());
 			report += String.format("%-7s", r.getValue().getTotal());
-			report += "\n";
+			report += "\r\n";
 		}
 		return report;
 	}

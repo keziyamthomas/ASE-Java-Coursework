@@ -431,13 +431,12 @@ public class Gui extends javax.swing.JFrame {
         totalLabel.setText(Double.toString((double)total - discountAmt));
         discountAmtLabel.setText(Double.toString(discountAmt));
         
+        processClass.addOrder(getCurrentOrderList((double)total - discountAmt));
         
-        System.out.println(Double.toString((double)total - discountAmt) + "In GUI 1");
-        System.out.println(Double.toString(discountAmt) + "In GUI 2");
     }                                        
 
     private void hotBeverageBtnActionPerformed(java.awt.event.ActionEvent evt) {                                               
-    	List<String> list = processClass.getItemByCategory("HotBeverage");
+    	List<String> list = processClass.getItemsByCategory("HotBeverage");
     	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
     	for(String str: list) {
     		df.addElement(str);
@@ -461,7 +460,7 @@ public class Gui extends javax.swing.JFrame {
     }                                           
 
     private void shakesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                          
-    	List<String> list = processClass.getItemByCategory("Shake");
+    	List<String> list = processClass.getItemsByCategory("Shake");
     	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
     	for(String str: list) {
     		df.addElement(str);
@@ -472,7 +471,7 @@ public class Gui extends javax.swing.JFrame {
     }                                         
 
     private void coldBeveragesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                                 
-    	List<String> list = processClass.getItemByCategory("ColdBeverage");
+    	List<String> list = processClass.getItemsByCategory("ColdBeverage");
     	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
     	for(String str: list) {
     		df.addElement(str);
@@ -483,7 +482,7 @@ public class Gui extends javax.swing.JFrame {
     }                                                
 
     private void quickBitesBtnActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        List<String> list = processClass.getItemByCategory("Quick bites");
+        List<String> list = processClass.getItemsByCategory("Quick bites");
     	DefaultComboBoxModel<String> df = new DefaultComboBoxModel<String>();
     	for(String str: list) {
     		df.addElement(str);
@@ -494,6 +493,9 @@ public class Gui extends javax.swing.JFrame {
     
     private void formWindowClosing(java.awt.event.WindowEvent evt) {                                   
         // Generate Report
+    	processClass.populateReportList();
+    	processClass.WriteToFile();
+    	
     }   
     
     public void saveOrderToList(Timestamp time, String custId, String item, int quantity, double amount)
@@ -503,15 +505,15 @@ public class Gui extends javax.swing.JFrame {
         orderList.add(order);
     }
     
-    public LinkedList<Order> getCurrentOrderList()
+    public LinkedList<Order> getCurrentOrderList(double amt)
     {
         // Iterate through the table and add return the full order as list
     	for (int row=0; row < orderTable.getRowCount(); row++) {
     		Timestamp time = new Timestamp(System.currentTimeMillis());
     		String custId = processClass.getItemIdByItemName(orderTable.getValueAt(row, 1).toString());
     		String item = orderTable.getValueAt(row, 1).toString();
-    		int quantity = (Integer)orderTable.getValueAt(row, 3);
-    		int amount = (Integer)orderTable.getValueAt(row, 2) * (Integer)orderTable.getValueAt(row, 3); //unitPrice * quantity
+    		int quantity = Integer.parseInt(orderTable.getValueAt(row, 3).toString()); 
+    		double amount = amt;
     		saveOrderToList(time,custId,item,quantity,amount);
     	}
     	return orderList;
